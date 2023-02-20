@@ -9,22 +9,27 @@ pub fn fusion<S: AsRef<str>>(
 ) -> HashMap<String, String> {
     let variables: Vec<&str> = defaults.keys().map(|key| key.as_ref()).collect();
     let confs: HashMap<String, String> = if let Some(config_path) = config_path {
-        fs::read_to_string(config_path.as_ref())
-            .unwrap()
-            .lines()
-            .filter_map(|line| {
-                let keyvalue = if line.contains("=") {
-                    let (key, value) = line.split_once("=").unwrap();
-                    Some((key.trim_end().to_string(), value.trim_start().to_string()))
-                } else if line.contains(":") {
-                    let (key, value) = line.split_once(":").unwrap();
-                    Some((key.trim_end().to_string(), value.trim_start().to_string()))
-                } else {
-                    None
-                };
-                keyvalue
-            })
-            .collect()
+        match fs::read_to_string(config_path.as_ref()) {
+            Ok(file) => file
+                .lines()
+                .filter_map(|line| {
+                    let keyvalue = if line.contains('=') {
+                        let (key, value) = line.split_once('=').unwrap();
+                        Some((key.trim_end().to_string(), value.trim_start().to_string()))
+                    } else if line.contains(':') {
+                        let (key, value) = line.split_once(':').unwrap();
+                        Some((key.trim_end().to_string(), value.trim_start().to_string()))
+                    } else {
+                        None
+                    };
+                    keyvalue
+                })
+                .collect(),
+            Err(err) => {
+                log::error!("Unable to read config file: {}", err);
+                HashMap::new()
+            }
+        }
     } else {
         HashMap::new()
     };
@@ -42,11 +47,11 @@ pub fn fusion<S: AsRef<str>>(
             } else {
                 arg
             };
-            let keyvalue = if arg.contains("=") {
-                let (key, value) = arg.split_once("=").unwrap();
+            let keyvalue = if arg.contains('=') {
+                let (key, value) = arg.split_once('=').unwrap();
                 Some((key.to_string(), value.to_string()))
-            } else if arg.contains(":") {
-                let (key, value) = arg.split_once(":").unwrap();
+            } else if arg.contains(':') {
+                let (key, value) = arg.split_once(':').unwrap();
                 Some((key.to_string(), value.to_string()))
             } else {
                 None

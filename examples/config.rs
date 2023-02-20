@@ -3,6 +3,10 @@ extern crate confargenv;
 use std::collections::HashMap;
 
 fn main() {
+    logger::BareLogger::new(log::LevelFilter::Trace)
+        .init()
+        .unwrap();
+
     // floating=e3.14 bool=etrue cargo run --example config -- --bool=atrue
     // priority: defaults -> conf -> env -> args
     let mut defaults = HashMap::new();

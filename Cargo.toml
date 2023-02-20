@@ -8,6 +8,9 @@ edition = "2021"
 [dependencies]
 log = "0.4.17"
 
+[dev-dependencies]
+logger =  { version = "*", git = "https://github.com/kirinokirino/logger" }
+
 [[example]]
 name = "config"
 crate-type = ["bin"]
