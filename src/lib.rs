@@ -15,9 +15,15 @@ pub fn fusion<S: AsRef<str>>(
                 .filter_map(|line| {
                     let keyvalue = if line.contains('=') {
                         let (key, value) = line.split_once('=').unwrap();
+                        if !variables.contains(&key) {
+                            log::warn!("Unhandled config line: {} - {}", key, value)
+                        }
                         Some((key.trim_end().to_string(), value.trim_start().to_string()))
                     } else if line.contains(':') {
                         let (key, value) = line.split_once(':').unwrap();
+                        if !variables.contains(&key) {
+                            log::warn!("Unhandled config line: {} - {}", key, value)
+                        }
                         Some((key.trim_end().to_string(), value.trim_start().to_string()))
                     } else {
                         None
@@ -49,9 +55,15 @@ pub fn fusion<S: AsRef<str>>(
             };
             let keyvalue = if arg.contains('=') {
                 let (key, value) = arg.split_once('=').unwrap();
+                if !variables.contains(&key) {
+                    log::warn!("Unhandled command-line argument: {} - {}", key, value)
+                }
                 Some((key.to_string(), value.to_string()))
             } else if arg.contains(':') {
                 let (key, value) = arg.split_once(':').unwrap();
+                if !variables.contains(&key) {
+                    log::warn!("Unhandled command-line argument: {} - {}", key, value)
+                }
                 Some((key.to_string(), value.to_string()))
             } else {
                 None
@@ -71,6 +83,7 @@ pub fn fusion<S: AsRef<str>>(
             } else if confs.contains_key(key) {
                 confs.get(key).unwrap()
             } else {
+                log::info!("Default value left unchanged: {}", key);
                 value.as_ref()
             };
             (key.to_string(), value.to_string())
